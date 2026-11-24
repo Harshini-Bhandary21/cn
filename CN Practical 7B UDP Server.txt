@@ -1,0 +1,45 @@
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+using namespace std;
+
+int main()
+{
+    char buffer[1024] = {0};
+
+    // 1. Create socket
+    int serverSocket = socket(AF_INET, SOCK_DGRAM, 0);
+
+    // 2. Configure address
+    sockaddr_in serverAddr{}, clientAddr{};
+    socklen_t addrSize = sizeof(clientAddr);
+
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(8081);
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+
+    // 3. Bind socket
+    bind(serverSocket, (sockaddr*)&serverAddr,
+         sizeof(serverAddr));
+
+    cout << "Waiting for client message..." << endl;
+
+    // 4. Receive message
+    recvfrom(serverSocket, buffer, sizeof(buffer)-1, 0,
+             (sockaddr*)&clientAddr, &addrSize);
+
+    cout << "Client: " << buffer << endl;
+
+    // 5. Send message
+    char msg[] = "Hello from UDP Server";
+
+    sendto(serverSocket, msg, strlen(msg), 0,
+           (sockaddr*)&clientAddr, addrSize);
+
+    // 6. Close socket
+    close(serverSocket);
+
+    return 0;
+}

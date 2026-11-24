@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int n, w, lost;
+
+    cout << "Enter number of frames: ";
+    cin >> n;
+
+    cout << "Enter window size: ";
+    cin >> w;
+
+    cout << "Enter frame number to simulate loss (0 for none): ";
+    cin >> lost;
+
+    vector<bool> received(n + 1, false);
+
+    for (int i = 1; i <= n; i += w) {
+        int end = min(i + w - 1, n);
+
+        cout << "\nSending window: ";
+        for (int j = i; j <= end; j++) {
+            cout << j << " ";
+        }
+        cout << endl;
+
+        for (int j = i; j <= end; j++) {
+            if (j == lost && !received[j]) {
+                cout << "Frame " << j << " lost!" << endl;
+            } else {
+                received[j] = true;
+                cout << "Frame " << j
+                     << " received. ACK " << j << " sent." << endl;
+            }
+        }
+
+        if (lost >= i && lost <= end && !received[lost]) {
+            cout << "\nRetransmitting only Frame " << lost << endl;
+            received[lost] = true;
+            cout << "Frame " << lost << " received successfully." << endl;
+            cout << "ACK " << lost << " received." << endl;
+            lost = 0;
+        }
+    }
+
+    cout << "\nAll frames transmitted successfully.\n";
+    return 0;
+}

@@ -1,0 +1,57 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int n, w, lost;
+
+    cout << "Enter number of frames: ";
+    cin >> n;
+
+    cout << "Enter window size: ";
+    cin >> w;
+
+    cout << "Enter frame number to simulate loss (0 for none): ";
+    cin >> lost;
+
+    int i = 1;
+
+    while (i <= n) {
+        int end = min(i + w - 1, n);
+
+        cout << "\nSending window: ";
+        for (int j = i; j <= end; j++) {
+            cout << j << " ";
+        }
+        cout << endl;
+
+        if (lost >= i && lost <= end) {
+            for (int j = i; j < lost; j++) {
+                cout << "ACK " << j << " received." << endl;
+            }
+
+            cout << "Frame " << lost << " lost!" << endl;
+            cout << "Receiver discards subsequent out-of-order frames." << endl;
+            cout << "Go-Back-N: Retransmitting frames "
+                 << lost << " to " << end << endl;
+
+            for (int j = lost; j <= end; j++) {
+                cout << "Frame " << j << " received successfully." << endl;
+                cout << "ACK " << j << " received." << endl;
+            }
+
+            i = end + 1;
+            lost = 0;
+        } else {
+            for (int j = i; j <= end; j++) {
+                cout << "Frame " << j << " received successfully." << endl;
+                cout << "ACK " << j << " received." << endl;
+            }
+
+            i = end + 1;
+        }
+    }
+
+    cout << "\nAll frames transmitted successfully.\n";
+    return 0;
+}

@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+int main() {
+    int n, e, u, v, w, src;
+    cout << "Enter vertices and edges: ";
+    cin >> n >> e;
+
+    vector<vector<pair<int,int>>> adj(n);
+
+    cout << "Enter edges (u v weight):\n";
+    for (int i = 0; i < e; i++) {
+        cin >> u >> v >> w;
+        adj[u].push_back({v, w});
+        adj[v].push_back({u, w});
+    }
+
+    cout << "Enter source: ";
+    cin >> src;
+
+    vector<int> dist(n, INT_MAX);
+    dist[src] = 0;
+
+    for (int i = 1; i < n; i++) {
+        for (int u = 0; u < n; u++) {
+            for (auto edge : adj[u]) {
+                int v = edge.first;
+                int w = edge.second;
+
+                if (dist[u] != INT_MAX &&
+                    dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                }
+            }
+        }
+    }
+
+    cout << "\nRouter\tShortest Distance\n";
+    for (int i = 0; i < n; i++) {
+        cout << i << "\t";
+        if (dist[i] == INT_MAX) cout << "INF\n";
+        else cout << dist[i] << endl;
+    }
+
+    return 0;
+}

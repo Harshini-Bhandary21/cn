@@ -1,0 +1,48 @@
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+using namespace std;
+
+int main()
+{
+    char buffer[1024] = {0};
+
+    // 1. Create socket
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+    // 2. Configure address
+    sockaddr_in serverAddr{};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(8080);
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+
+    // 3. Bind socket
+    bind(serverSocket, (sockaddr*)&serverAddr,
+         sizeof(serverAddr));
+
+    // 4. Listen
+    listen(serverSocket, 5);
+
+    cout << "Waiting for client..." << endl;
+
+    // 5. Accept connection
+    int clientSocket = accept(serverSocket, NULL, NULL);
+
+    cout << "Client connected!" << endl;
+
+    // 6. Receive message
+    recv(clientSocket, buffer, sizeof(buffer)-1, 0);
+    cout << "Client: " << buffer << endl;
+
+    // 7. Send message
+    char msg[] = "Hello from TCP Server";
+    send(clientSocket, msg, strlen(msg), 0);
+
+    // 8. Close sockets
+    close(clientSocket);
+    close(serverSocket);
+
+    return 0;
+}

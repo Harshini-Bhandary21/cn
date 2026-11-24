@@ -1,0 +1,28 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, lost;
+
+    cout << "Enter number of frames: ";
+    cin >> n;
+
+    cout << "Enter frame number to simulate loss (0 for none): ";
+    cin >> lost;
+
+    for (int i = 1; i <= n; i++) {
+        cout << "\nSender: Sending frame " << i << endl;
+
+        if (i == lost) {
+            cout << "Channel: Frame " << i << " lost!" << endl;
+            cout << "Sender: Timeout! Retransmitting frame " << i << endl;
+        }
+
+        cout << "Receiver: Frame " << i << " received successfully." << endl;
+        cout << "Receiver: Sending ACK " << i << endl;
+        cout << "Sender: ACK " << i << " received." << endl;
+    }
+
+    cout << "\nAll frames transmitted successfully.\n";
+    return 0;
+}

@@ -1,0 +1,60 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string crc(string bits, const string& key) {
+    size_t k = key.size();
+
+    for (size_t i = 0; i + k <= bits.size(); i++) {
+        if (bits[i] == '1') {
+            for (size_t j = 0; j < k; j++) {
+                bits[i + j] = (bits[i + j] == key[j]) ? '0' : '1';
+            }
+        }
+    }
+
+    return bits.substr(bits.size() - (k - 1));
+}
+
+int main() {
+    string data, key;
+    int pos;
+
+    cout << "Enter data bits: ";
+    cin >> data;
+
+    cout << "Enter generator polynomial: ";
+    if (!(cin >> key) || data.find_first_not_of("01") != string::npos ||
+        key.size() < 2 || key.find_first_not_of("01") != string::npos ||
+        key.front() != '1' || key.back() != '1') {
+        cout << "Invalid binary data or generator!\n";
+        return 1;
+    }
+
+    string remainder = crc(data + string(key.size() - 1, '0'), key);
+    string received = data + remainder;
+
+    cout << "\nCRC Remainder: " << remainder << '\n';
+    cout << "Transmitted Codeword: " << received << '\n';
+
+    cout << "\nEnter bit position to flip (0-indexed, -1 for no error): ";
+    if (!(cin >> pos) || pos < -1 ||
+        (pos >= 0 && static_cast<size_t>(pos) >= received.size())) {
+        cout << "Invalid error position!\n";
+        return 1;
+    }
+
+    if (pos >= 0)
+        received[pos] = (received[pos] == '0') ? '1' : '0';
+
+    string check = crc(received, key);
+    cout << "\nReceived Codeword: " << received << '\n';
+    cout << "Receiver's Remainder: " << check << '\n';
+
+    if (check.find('1') == string::npos)
+        cout << "Result: No error detected.\n";
+    else
+        cout << "Result: Error detected!\n";
+
+    return 0;
+}

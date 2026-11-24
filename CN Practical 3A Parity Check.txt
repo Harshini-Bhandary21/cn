@@ -1,0 +1,46 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, mode, bit, parity = 0;
+
+    cout << "Enter number of data bits: ";
+    if (!(cin >> n) || n <= 0) {
+        cout << "Invalid number of data bits.\n";
+        return 1;
+    }
+
+    cout << "Choose parity (0 for even, 1 for odd): ";
+    if (!(cin >> mode) || (mode != 0 && mode != 1)) {
+        cout << "Invalid parity choice.\n";
+        return 1;
+    }
+
+    cout << "Enter data bits:\n";
+    for (int i = 0; i < n; i++) {
+        if (!(cin >> bit) || (bit != 0 && bit != 1)) {
+            cout << "Enter only 0 or 1.\n";
+            return 1;
+        }
+        parity ^= bit;
+    }
+
+    cout << "Parity bit = " << (parity ^ mode) << '\n';
+
+    cout << "Enter received data bits including parity:\n";
+    parity = 0;
+    for (int i = 0; i <= n; i++) {
+        if (!(cin >> bit) || (bit != 0 && bit != 1)) {
+            cout << "Enter only 0 or 1.\n";
+            return 1;
+        }
+        parity ^= bit;
+    }
+
+    if (parity == mode)
+        cout << "No error detected.\n";
+    else
+        cout << "Error detected.\n";
+
+    return 0;
+}

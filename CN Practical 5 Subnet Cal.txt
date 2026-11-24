@@ -1,0 +1,67 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <cstdint>
+#include <iomanip>
+using namespace std;
+
+string toIP(uint32_t ip) {
+    return to_string((ip >> 24) & 255) + "." +
+           to_string((ip >> 16) & 255) + "." +
+           to_string((ip >> 8) & 255) + "." +
+           to_string(ip & 255);
+}
+
+int main() {
+    string ip;
+    int cidr_prefix, a, b, c, d;
+    char dot1, dot2, dot3;
+
+    cout << "Enter IP Address: ";
+    cin >> ip;
+
+    cout << "Enter CIDR Prefix: ";
+    cin >> cidr_prefix;
+
+    stringstream ss(ip);
+    if (!(ss >> a >> dot1 >> b >> dot2 >> c >> dot3 >> d) ||
+        dot1 != '.' || dot2 != '.' || dot3 != '.' ||
+        a < 0 || a > 255 || b < 0 || b > 255 ||
+        c < 0 || c > 255 || d < 0 || d > 255 ||
+        (ss >> ws, !ss.eof()) ||
+        !cin || cidr_prefix < 0 || cidr_prefix > 32) {
+        cout << "Invalid input!";
+        return 1;
+    }
+
+    uint32_t ipNum = (uint32_t(a) << 24) |
+                     (uint32_t(b) << 16) |
+                     (uint32_t(c) << 8) |
+                     uint32_t(d);
+
+    uint32_t mask = cidr_prefix == 0 ? 0 :
+                    (0xFFFFFFFFu << (32 - cidr_prefix));
+
+    uint32_t network = ipNum & mask;
+    uint32_t broadcast = network | (~mask);
+
+    uint64_t total = 1ULL << (32 - cidr_prefix);
+    uint64_t usable = cidr_prefix <= 30 ? total - 2 :
+                      (cidr_prefix == 31 ? 2 : 1);
+
+    uint32_t first = cidr_prefix <= 30 ? network + 1 : network;
+    uint32_t last = cidr_prefix <= 30 ? broadcast - 1 : broadcast;
+
+    cout << "\n========== SUBNET DETAILS ==========\n";
+    cout << left << setw(19) << "IP Address" << ": " << ip << "/" << cidr_prefix << endl;
+    cout << setw(19) << "Subnet Mask" << ": " << toIP(mask) << endl;
+    cout << setw(19) << "Network Address" << ": " << toIP(network) << endl;
+    cout << setw(19) << "Broadcast Address" << ": " << toIP(broadcast) << endl;
+    cout << setw(19) << "First Usable IP" << ": " << toIP(first) << endl;
+    cout << setw(19) << "Last Usable IP" << ": " << toIP(last) << endl;
+    cout << setw(19) << "Usable Hosts" << ": " << usable << endl;
+    cout << setw(19) << "Total Addresses" << ": " << total << endl;
+    cout << "====================================\n";
+
+    return 0;
+}
